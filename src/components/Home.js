@@ -1,14 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { getEvents } from "../api/events";
-import 'bootstrap/dist/css/bootstrap.min.css';
-import moment from "moment";
+import { jwtDecode } from "jwt-decode";
 const Home = () => {
-  const [events, setEvents] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalEvents, setTotalEvents] = useState(0);
   const [navbar, setNavbar] = useState(window.scrollY >= 10);
   const changeBackground = () => setNavbar(window.scrollY >= 10);
 
@@ -18,45 +11,28 @@ const Home = () => {
       window.removeEventListener("scroll", changeBackground);
     };
   }, []);
+  const [tokenExpired, setTokenExpired] = useState(false);
 
-  const sortEvents = (field, order) => {
-    const sortedEvents = events?.sort((a, b) => {
-      if (order === "asc") {
-        return a[field] > b[field] ? 1 : -1;
+  useEffect(() => {
+    const token = localStorage.getItem("authToken");
+    if (token) {
+      const decodedToken = jwtDecode(token);
+      const currentTime = Date.now();
+      if (decodedToken.exp * 1000 < currentTime) {
+        console.log("Token has expired. Removing from localStorage.");
+        setTokenExpired(true);
+        localStorage.removeItem("authToken");
       } else {
-        return a[field] < b[field] ? 1 : -1;
+        setTokenExpired(false);
+        const timeDifference =
+          (decodedToken.exp * 1000 - currentTime) / (1000 * 3600);
+        console.log("Token expires in", timeDifference, "hours.");
       }
-    });
-    setEvents(sortedEvents);
-  };
-  const fetchData = async () => {
-    // const response = await axios.get(`${baseUrl}events/get-results`);
-    try {
-      setError("");
-      setLoading(true);
-      const response = await getEvents({page: currentPage, perPage: 10});/*axios.get(`${baseUrl}events/get-results?userId=${userId}`
-  , {
-      params: {
-      page: currentPage,
-        perPage: 10,
-      },
-    }); */
-    const totalCountHeader = response.headers.get('x-total-count');
-    console.log('Total Count Header:', totalCountHeader);
-    const totalCount = parseInt(totalCountHeader, 10);
-        setEvents(response.data);
-        setTotalEvents((prevTotal) => totalCount || prevTotal);
-    } catch (error) {
-      console.log("Error during fetching events", error);
-      setError(error.message);
-    } finally {
-      setLoading(false);
+    } else {
+      setTokenExpired(true);
     }
-  };
-  useEffect(()=> {
-fetchData();
-  }, [currentPage])
-  console.log(events, "events")
+  }, []);
+
   return (
     <>
       <div className="header-margin"></div>
@@ -67,52 +43,25 @@ fetchData();
               <img src="/img/general/logo-light.svg" alt="logo icon" />
             </Link>
 
+            {tokenExpired ? (
+              <Link
+                to="/login"
+                className="button btn px-3 fw-400 text-14 border-white -outline-white h-50 text-white"
+              >
+                Login
+              </Link>
+            ) : (
+              <Link
+                to="/events"
+                className="button btn px-3 fw-400 text-14 border-white -outline-white h-50 text-white"
+              >
+                Expo Race Dashboard
+              </Link>
+            )}
           </div>
         </div>
       </header>
-      <div className="content p-4">
-      <div className="mt-4 row y-gap-20 justify-content-center items-center">
-      <div className="row y-gap-30">
-            {events.map((item) => (
-              <div className="col-lg-2 col-sm-6" key={item?.id}>
-                <div className="hotelsCard__image">
-                  <div className="cardImage inside-slider">
-                    <Link
-                      to={`/upload-runnerdata?slug=${item?.slug}`}
-                      className="hotelsCard -type-1 hover-inside-slider ratio"
-                    >
-                      <img
-                        src={item?.eventPicture}
-                        className="img-thumbnail"
-                        alt="Event"
-                      />
-                    </Link>
-                    
-                  </div>
-                </div>
-                <div className="hotelsCard__content">
-                  <div className="d-flex flew-row justify-content-between mt-2">
-                    <div>
-                      <Link
-                        to={`/event/${item.slug}`}
-                        className="hotelsCard -type-1"
-                      >
-                        <h5 className="hotelsCard__title text-14 fw-500">
-                          <span>{item?.eventName}</span>
-                        </h5>
-                        <p className="text-14">{item?.location}</p>
-                        <p className="text-14">{moment(item?.date).format('MMMM D, YYYY')}</p>
-                      </Link>
-                    </div>
-              
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-    
-        </div>
-        </div>
+      <div className=""></div>
     </>
   );
 };

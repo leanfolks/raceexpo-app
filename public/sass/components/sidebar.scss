@@ -27,6 +27,7 @@
 @media (max-width: 767px) {
   .sidebar {
     left: -250px;
+    z-index:1050;
   }
 }
 
