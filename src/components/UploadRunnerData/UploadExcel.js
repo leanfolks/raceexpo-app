@@ -5,9 +5,13 @@ import axios from 'axios';
 import * as XLSX from 'xlsx';
 import { baseUrl } from '../../apiConfig';
 import BlockingLoader from "../Common/Loader";
+import ToastComponent from "../Common/Toast";
 const UploadExcel = ({ slug }) => {
   const [file, setFile] = useState(null);
   const [excelColumns, setExcelColumns] = useState([]);
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
+  const [toastVariant, setToastVariant] = useState("");
   const [dbColumns, setDbColumns] = useState([]);
   const [labelMappings, setLabelMappings] = useState({});
   const [showModal, setShowModal] = useState(false);
@@ -75,9 +79,17 @@ const [loading, setLoading] = useState(false);
       setLoading(true);
       const response = await axios.post(`${baseUrl}events/upload-runnerdata?slug=${slug}`, formData);
       console.log(response.data);
+      setToastMessage("Runner data uploaded successfully!");
+      setToastVariant("success");
+      setShowToast(true);
       setShowModal(false);
     } catch (error) {
       setError(error.response.data.error ||"An error occurred while uploading the data.");
+      setToastMessage(
+        error.response?.data?.error ||
+          "An error occurred while uploading the data."
+      );
+      setToastVariant("danger");
       console.error(error);
     }
     finally {
@@ -92,8 +104,15 @@ const [loading, setLoading] = useState(false);
           <label className="text-16 fw-bold text-light-1 mb-2">Upload Runner Data</label>
           <input type="file" className="form-control" onChange={handleFileUpload} />
         </div>
+  
       </div>
-
+      <ToastComponent
+  showToast={showToast}
+  toastHeader="Upload Excel"
+  setShowToast={setShowToast}
+  toastMessage={toastMessage}
+  toastVariant={toastVariant}
+/>
       <Modal show={showModal} onHide={() => setShowModal(false)}>
         <Modal.Header closeButton>
           <Modal.Title>Map Excel Columns to Database Columns</Modal.Title>
@@ -117,7 +136,7 @@ const [loading, setLoading] = useState(false);
                     {dbColumns
                       .filter(
                         (dbColumn) =>
-                          !["id", "createdAt", "updatedAt", "qrCode", "eventId", "emailStatus"].includes(dbColumn) &&
+                          !["id", "createdAt", "updatedAt", "qrCode", "eventId", "emailStatus", "whatsappStatus", "isDistributed"].includes(dbColumn) &&
                           !Object.values(labelMappings).includes(dbColumn)
                       )
                       .map((dbColumn, idx) => (

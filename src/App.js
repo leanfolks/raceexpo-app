@@ -9,6 +9,8 @@ import Home from "./components/Home";
 import Index from "./components/UploadRunnerData/Index";
 import CreateVolunteers from "./components/Volunteer/CreateVolunteers";
 import Login from "./components/Login";
+import Statistics from "./components/UploadRunnerData/Statistics";
+import UploadedData from "./components/UploadRunnerData/UploadedData";
 function App() {
   return (
     <BrowserRouter>
@@ -21,7 +23,8 @@ function App() {
           <Route path="create-volunteer" element={<CreateVolunteers />} />
           <Route path="assign-volunteers" element={<AssignVolunteers/> }/>
           <Route path="/upload-runnerdata" element={<Index/> }/>
-          
+          <Route path="/statistics" element={<Statistics /> }/>
+          <Route path="/list" element={<UploadedData /> }/>
         </Route>
       </Routes>
     </BrowserRouter>

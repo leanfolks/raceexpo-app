@@ -7,8 +7,9 @@ import { baseUrl } from '../../apiConfig';
 import Sidebar from "../Sidebar";
 import DashboardHeader from "../DashboardHeader";
 import UploadExcel from './UploadExcel';
-import UploadedData from './UploadedData';
 import {Tabs, Tab} from "react-bootstrap";
+import GenerateQrCodes from './GenerateQrCodes';
+import Statistics from './Statistics';
 const Index = () => {
   const location = useLocation();
   const [isOpen, setIsOpen] = useState(false);
@@ -29,8 +30,11 @@ const Index = () => {
           <Tab eventKey="upload" title="Upload Excel">
             <UploadExcel slug={slug}/>
           </Tab>
-          <Tab eventKey="uploaded" title="Uploaded List ">
-            <UploadedData />
+          <Tab eventKey="GenerateQRCode" title="Generate QR Codes">
+            <GenerateQrCodes />
+          </Tab>
+          <Tab eventKey="statistics" title="Statistics ">
+            <Statistics slug={slug}/>
           </Tab>
           </Tabs>
       </div>

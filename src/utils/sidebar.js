@@ -9,4 +9,9 @@ export const sidebarContent = [
     name: "Volunteers",
     routePath: `/volunteers`,
   },
+  {
+    id: 3,
+    name: "List of uploads",
+    routePath: `/list`,
+  },
 ];

@@ -7,13 +7,18 @@ import paginationFactory, { PaginationProvider, PaginationListStandalone } from 
 import filterFactory, { selectFilter } from "react-bootstrap-table2-filter";
 import BootstrapTable from 'react-bootstrap-table-next';
 import { getEvents } from '../../api/events';
-
+import Sidebar from "../Sidebar";
+import DashboardHeader from "../DashboardHeader";
 const UploadedData = () => {
 const [list, setList] = useState([]);
 const [loading, setLoading] = useState(false); 
 const [selectedEvent, setSelectedEvent] = useState("")
 const [events, setEvents] = useState([]);
-
+const [isOpen, setIsOpen] = useState(false);
+const handleToggle = () => {
+  setIsOpen(!isOpen);
+  console.log("clicked");
+};
 
 useEffect(() => {
   const fetchData = async () => {
@@ -168,6 +173,12 @@ useEffect(() => {
 
   return (
     <>
+        <div className="header-margin"></div>
+ 
+ <DashboardHeader handleToggle={handleToggle} />
+
+ <Sidebar isOpen={isOpen} handleToggle={handleToggle}/>
+ <div className="content p-4">
     {list.length > 0 ? (
       <>
        <div className="mt-3">Total: <span style={{fontWeight: "bold"}}>{filteredList.length}</span></div>
@@ -213,7 +224,10 @@ totalSize: filteredList.length
 </PaginationProvider>
 </>
     ) : <h3 className="text-center fw-bold mt-3">No data available</h3>}
+    </div>
+
     </>
+
   )
 }
 
