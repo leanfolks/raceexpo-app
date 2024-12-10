@@ -102,9 +102,9 @@ fetchData();
                         to={`/event/${item.slug}`}
                         className="hotelsCard -type-1"
                       >
-                        <h5 className="hotelsCard__title text-14 fw-500">
+                        <h6 className="hotelsCard__title text-14 fw-500">
                           <span>{item?.eventName}</span>
-                        </h5>
+                        </h6>
                         <p className="text-14">{item?.location}</p>
                         <p className="text-14">{moment(item?.date).format('MMMM D, YYYY')}</p>
                       </Link>

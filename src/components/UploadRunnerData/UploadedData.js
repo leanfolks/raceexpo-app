@@ -9,6 +9,7 @@ import BootstrapTable from 'react-bootstrap-table-next';
 import { getEvents } from '../../api/events';
 import Sidebar from "../Sidebar";
 import DashboardHeader from "../DashboardHeader";
+import BlockingLoader from '../Common/Loader';
 const UploadedData = () => {
 const [list, setList] = useState([]);
 const [loading, setLoading] = useState(false); 
@@ -57,7 +58,7 @@ useEffect(() => {
         const listWithEventNames = res && res.data.map(item => {
           const event = events.find(event => event.id === item.eventId);
           console.log(event, "event")
-          return { ...item, eventName: event ? event.eventName : 'N/A' };
+          return { ...item, eventName: event ? event?.eventName : 'N/A' };
         });
         setList(listWithEventNames);
       } catch (error) {
@@ -68,7 +69,9 @@ useEffect(() => {
       }
      
     }
-    fetchList();
+    if (events.length > 0) {
+      fetchList();
+    }
   }, [events]);
   function downloadExcel(row) {
     fetch(row.s3Url)
@@ -223,7 +226,7 @@ totalSize: filteredList.length
 }
 </PaginationProvider>
 </>
-    ) : <h3 className="text-center fw-bold mt-3">No data available</h3>}
+    ) : <BlockingLoader/>}
     </div>
 
     </>

@@ -6,8 +6,11 @@ import * as XLSX from 'xlsx';
 import { baseUrl } from '../../apiConfig';
 import BlockingLoader from "../Common/Loader";
 import ToastComponent from "../Common/Toast";
+import BootstrapTable from 'react-bootstrap-table-next';
+import paginationFactory, { PaginationProvider, PaginationListStandalone } from 'react-bootstrap-table2-paginator';
 const UploadExcel = ({ slug }) => {
   const [file, setFile] = useState(null);
+  const [excelData, setExcelData] = useState([]); 
   const [excelColumns, setExcelColumns] = useState([]);
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
@@ -17,10 +20,24 @@ const UploadExcel = ({ slug }) => {
   const [showModal, setShowModal] = useState(false);
   const [error, setError] = useState(null);
 const [loading, setLoading] = useState(false);
+const columns = excelColumns.map((col) => ({
+  dataField: col,
+  text: col,
+  sort: true,
+  style: {
+    whiteSpace: "nowrap",
+    verticalAlign: "middle",
+  },
+  headerStyle: {
+    whiteSpace: "nowrap",
+    textAlign: "center",
+  },
+}));
+
   useEffect(() => {
     const fetchColumnNames = async () => {
       try {
-        const response = await axios.get(`${baseUrl}events/get-column-names`);
+        const response = await axios.get(`${baseUrl}events/get-column-names-runnerdata`);
         setDbColumns(response.data.columns);
       } catch (error) {
         console.error("Error fetching column names:", error);
@@ -39,6 +56,7 @@ const [loading, setLoading] = useState(false);
       const data = new Uint8Array(event.target.result);
       const workbook = XLSX.read(data, { type: "array" });
       const sheet = workbook.Sheets[workbook.SheetNames[0]];
+      const jsonData = XLSX.utils.sheet_to_json(sheet, { defval: "" });
       const headers = XLSX.utils.sheet_to_json(sheet, { header: 1 })[0];
 
       const initialMappings = {};
@@ -52,6 +70,7 @@ const [loading, setLoading] = useState(false);
       });
       setLabelMappings(initialMappings);
       setExcelColumns(headers);
+      setExcelData(jsonData);
       setShowModal(true);
     };
     reader.readAsArrayBuffer(selectedFile);
@@ -113,6 +132,48 @@ const [loading, setLoading] = useState(false);
   toastMessage={toastMessage}
   toastVariant={toastVariant}
 />
+{excelData.length > 0 && (
+        <div className="mt-4">
+          <h4>Preview</h4>
+          <PaginationProvider
+       pagination={ paginationFactory({
+         custom: true,
+         sizePerPage:20,
+totalSize: excelData?.length
+       }) }
+     >
+       {
+         ({
+           paginationProps,
+           paginationTableProps
+         }) => (
+           <div>
+            <div style={{ overflowX:"auto", marginTop:"15px"}}>
+             <PaginationListStandalone
+               { ...paginationProps }
+             />
+             </div>
+      <div
+        style={{ maxHeight: "450px", overflowY: "auto" }}
+        className="table-responsive pb-4"
+      >
+          <BootstrapTable
+            keyField="id"
+            data={excelData}
+            columns={columns}
+            {...paginationTableProps}
+            striped
+            hover
+            condensed
+          />
+          </div>
+      </div>
+)
+}
+</PaginationProvider>
+        </div>
+      )}
+
       <Modal show={showModal} onHide={() => setShowModal(false)}>
         <Modal.Header closeButton>
           <Modal.Title>Map Excel Columns to Database Columns</Modal.Title>

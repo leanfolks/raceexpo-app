@@ -31,7 +31,7 @@ const Index = () => {
             <UploadExcel slug={slug}/>
           </Tab>
           <Tab eventKey="GenerateQRCode" title="Generate QR Codes">
-            <GenerateQrCodes />
+            <GenerateQrCodes slug={slug}/>
           </Tab>
           <Tab eventKey="statistics" title="Statistics ">
             <Statistics slug={slug}/>
