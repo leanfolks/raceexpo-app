@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useLocation} from "react-router-dom";
 import Sidebar from "../Sidebar";
 import DashboardHeader from "../DashboardHeader";
 import { Form } from "react-bootstrap";
@@ -14,6 +14,8 @@ import BootstrapTable from "react-bootstrap-table-next";
 import { getEvents } from "../../api/events";
 
 const AssignVolunteers = () => {
+    const location = useLocation();
+    const userId = new URLSearchParams(location.search).get("userId");
   const [isOpen, setIsOpen] = useState(false);
   const [volunteers, setVolunteers] = useState([]);
   const [events, setEvents] = useState([]);
@@ -50,7 +52,7 @@ const [selectedEvent, setSelectedEvent] = useState("");
       let currentPage = 1;
       const perPage = 10;
       let totalEvents = 0;
-      const response = await getEvents({ page: currentPage, perPage });
+      const response = await getEvents({ userId: userId, page: currentPage, perPage });
       const totalCountHeader = response.headers.get('x-total-count');
       console.log('Total Count Header:', totalCountHeader);
   

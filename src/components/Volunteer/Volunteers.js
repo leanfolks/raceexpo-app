@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useLocation } from "react-router-dom";
 import Sidebar from "../Sidebar";
 import DashboardHeader from "../DashboardHeader";
 import { Form } from "react-bootstrap";
@@ -13,6 +13,8 @@ import ToastComponent from "../Common/Toast";
 import BootstrapTable from "react-bootstrap-table-next";
 const Volunteers = () => {
   const { slug } = useParams();
+  const location = useLocation();
+  const userId = new URLSearchParams(location.search).get("userId");
   const [isOpen, setIsOpen] = useState(false);
 const [loading, setLoading] = useState(false);
 const [volunteers, setVolunteers] = useState([]);
@@ -168,7 +170,7 @@ const [toastVariant, setToastVariant] = useState("");
           </Link>
           <Link
             className="btn border btn-primary mb-3 mobile-width"
-            to="/assign-volunteers"
+            to={`/assign-volunteers?userId=${userId}`}
           >
             Mapping
           </Link>

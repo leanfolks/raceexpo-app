@@ -32,7 +32,7 @@ const Home = () => {
       setTokenExpired(true);
     }
   }, []);
-
+  const userId = localStorage.getItem("userId");
   return (
     <>
       <div className="header-margin"></div>
@@ -52,7 +52,7 @@ const Home = () => {
               </Link>
             ) : (
               <Link
-                to="/events"
+                to={`/events?userId=${userId}`}
                 className="button btn px-3 fw-400 text-14 border-white -outline-white h-50 text-white"
               >
                 Expo Race Dashboard

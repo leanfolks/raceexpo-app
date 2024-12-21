@@ -115,9 +115,55 @@ const columns = excelColumns.map((col) => ({
       setLoading(false);
     }
   };
-
+  const downloadSampleExcel = () => {
+    const sampleData = [
+      {
+        Transponder1: "123456789",
+        Bib: "101",
+        FirstName: "John",
+        LastName: "Doe",
+        Distance: "5K",
+        Gender: "Male",
+        DateOfBirth: "01/01/1990",
+        CellPhone: "9876543210",
+        Email: "john.doe@example.com",
+        Tshirt: "M",
+        BloodGroup: "O+",
+        NameOnBib: "John",
+        EmergencyContactName: "Jane Doe",
+        EmergencyContactNumber: "9123456789",
+        Club: "Running Club",
+      },
+      {
+        Transponder1: "987654321",
+        Bib: "102",
+        FirstName: "Jane",
+        LastName: "Smith",
+        Distance: "10K",
+        Gender: "Female",
+        DateOfBirth: "15/06/1985",
+        CellPhone: "8765432109",
+        Email: "jane.smith@example.com",
+        Tshirt: "L",
+        BloodGroup: "A+",
+        NameOnBib: "Jane",
+        EmergencyContactName: "John Smith",
+        EmergencyContactNumber: "8123456789",
+        Club: "Fitness Club",
+      },
+    ];
+  
+    const worksheet = XLSX.utils.json_to_sheet(sampleData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "SampleData");
+    XLSX.writeFile(workbook, `${slug}_sample.xlsx`);
+  };
+  
   return (
     <>
+     <div className='d-flex justify-content-end'>
+            <button className='btn btn-primary' onClick={downloadSampleExcel}>Download Sample</button>
+            </div>
       <div className="row justify-content-center">
         <div className="col-md-3 mt-4">
           <label className="text-16 fw-bold text-light-1 mb-2">Upload Runner Data</label>

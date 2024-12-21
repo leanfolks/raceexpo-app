@@ -40,7 +40,7 @@ const Sidebar = ({ isOpen, handleToggle, slug }) => {
   //     ],
   //   },
   // ];
-
+  const userId = localStorage.getItem("userId");
   return (
     <div className={`sidebar -dashboard ${isOpen ? "open" : ""}`}>
       {sidebarContent.map((item) => {
@@ -56,7 +56,7 @@ const Sidebar = ({ isOpen, handleToggle, slug }) => {
              
               
                 <Link
-                  to={`${item.routePath}`}
+                  to={`${item.routePath}?userId=${userId}`}
                   className="d-flex items-center text-15 lh-1 fw-500"
                   style={{ textDecoration: "none" }}
                 >

@@ -48,6 +48,7 @@ const Login = () => {
 
         setStringifiedLocalStorageData("authToken", data.token);
         setStringifiedLocalStorageData("role", data.role);
+        localStorage.setItem('userId', data.id); 
         // axios.defaults.headers.common["Role"] = role;
         console.log("before navigate");
        
