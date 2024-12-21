@@ -190,7 +190,9 @@ totalSize: excelData?.length
                     handleMappingChange(excelColumn, selectedDbColumn)
                   }
                 >
-                  <Dropdown.Toggle variant="success" id="dropdown-basic">
+                  <Dropdown.Toggle variant={
+            labelMappings[excelColumn] ? "success" : "danger"
+          } id="dropdown-basic">
                     {labelMappings[excelColumn] || 'Select column'}
                   </Dropdown.Toggle>
                   <Dropdown.Menu>

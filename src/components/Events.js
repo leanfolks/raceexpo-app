@@ -1,13 +1,17 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
-import { getEvents } from "../api/events";
+import { Link, useLocation } from "react-router-dom";
+import { getEvents} from "../api/events";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import moment from "moment";
 import BlockingLoader from "./Common/Loader";
 import Pagination from "./Pagination";
 import Sidebar from "./Sidebar";
 import DashboardHeader from "./DashboardHeader";
+import axios from "axios";
+import { baseUrl } from "../apiConfig";
 const Events = () => {
+  const location = useLocation();
+  const userId = new URLSearchParams(location.search).get("userId");
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -24,57 +28,60 @@ const Events = () => {
     };
   }, []);
 
-  const sortEvents = (field, order) => {
-    const sortedEvents = events?.sort((a, b) => {
-      if (order === "asc") {
-        return a[field] > b[field] ? 1 : -1;
-      } else {
-        return a[field] < b[field] ? 1 : -1;
-      }
-    });
-    setEvents(sortedEvents);
-  };
   const fetchData = async () => {
-    // const response = await axios.get(`${baseUrl}events/get-results`);
-    try {
-      setError("");
-      setLoading(true);
-      const response = await getEvents({page: currentPage, perPage: 10});/*axios.get(`${baseUrl}events/get-results?userId=${userId}`
-  , {
-      params: {
-      page: currentPage,
-        perPage: 10,
-      },
-    }); */
-    const totalCountHeader = response.headers.get('x-total-count');
-    console.log('Total Count Header:', totalCountHeader);
-    const totalCount = parseInt(totalCountHeader, 10);
-        setEvents(response.data);
-        setTotalEvents((prevTotal) => totalCount || prevTotal);
-    } catch (error) {
-      console.log("Error during fetching events", error);
-      setError(error.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-  useEffect(()=> {
-fetchData();
-  }, [currentPage])
+    try{
+     setError("");
+     setLoading(true);
+     const response = await axios.get(`${baseUrl}events/get-results?userId=${userId}`
+     , {
+         params: {
+         page: currentPage,
+           perPage: 10,
+          // showOnWebsite: true
+         },
+       });
+         const totalCountHeader = response.headers.get('x-total-count');
+   console.log('Total Count Header:', totalCountHeader);
+   const totalCount = parseInt(totalCountHeader, 10);
+   // const filteredEvents = response.data.filter(event=> event.userId === parseInt(userId)) || []
+       setEvents(response.data);
+       setTotalEvents(response.data.length);
+       }
+        catch (error) {
+         console.error(error, "error");
+         setError(error.message);
+       }
+       finally {
+         setLoading(false);
+       }
+     };
+   
+     useEffect(() => {
+       fetchData();
+     }, [currentPage]);
+   
   const [isOpen, setIsOpen] = useState(false);
 
   const handleToggle = () => {
     setIsOpen(!isOpen);
     console.log("clicked");
   };
+
   return (
     <>
       <div className="header-margin"></div>
  
       <DashboardHeader handleToggle={handleToggle} />
 
-      <Sidebar isOpen={isOpen} handleToggle={handleToggle}/>
+      <Sidebar isOpen={isOpen} handleToggle={handleToggle} userId={userId}/>
       <div className="content p-4">
+        <div className="d-flex justify-content-end">
+      <Link to={`/event-create?userId=${userId}`}>
+        <button className="btn btn-primary" type="button">
+        Create Event
+        </button>
+        </Link>
+        </div>
       <div className="mt-4 row y-gap-20 justify-content-center items-center">
       <div className="row y-gap-30">
         {loading && <BlockingLoader />}

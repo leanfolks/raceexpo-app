@@ -93,7 +93,7 @@ if(showToast) {
         <form onSubmit={formik.handleSubmit}>
           <div className="row">
             <div className="mb-3 col-12">
-              <label htmlFor="username" className="form-label text-dark-1 fw-bold">
+              <label htmlFor="username" className="form-label fw-bold">
                 User Name
               </label>
               <input
@@ -112,7 +112,7 @@ if(showToast) {
               )}
             </div>
             <div className="mb-3 col-12">
-              <label htmlFor="password" className="form-label text-dark-1 fw-bold">
+              <label htmlFor="password" className="form-label fw-bold">
                 Password
               </label>
               <input

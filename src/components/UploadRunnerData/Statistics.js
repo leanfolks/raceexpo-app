@@ -46,7 +46,74 @@ const Statistics = ({ slug }) => {
       fetchRunnerData();
     }
   }, [slug, event?.id]);
+  const [tShirtCounts, setTShirtCounts] = useState({ Collected: {}, Pending: {} });
+  const defaultSizes = ["S", "M", "L", "XL", "XXL", "XXXL"]; 
+  useEffect(() => {
+    if (runnerData.length > 0) {
+      const tShirtData = { Collected: {}, Pending: {} };
+      defaultSizes.forEach((size) => {
+        tShirtData.Collected[size] = 0;
+        tShirtData.Pending[size] = 0;
+      });
+      runnerData.forEach((runner) => {
+        const { tShirt, isDistributed } = runner;
+        const status = isDistributed ? 'Collected' : 'Pending';
+  
+        if (!tShirtData[status][tShirt]) {
+          tShirtData[status][tShirt] = 0;
+        }
+  
+        tShirtData[status][tShirt]++;
+      });
+  
+      setTShirtCounts(tShirtData);
+    }
+  }, [runnerData]);
+  
+  const tShirtRows = ['Collected', 'Pending'].map((status) => {
+    const row = { status, total: 0 };
+  
+    // Populate counts for each size dynamically
+    Object.keys(tShirtCounts[status] || {}).forEach((size) => {
+      row[size] = tShirtCounts[status][size] || 0;
+      row.total += tShirtCounts[status][size] || 0;
+    });
+  
+    return row;
+  });
+  
+  // Add a total row at the end
+  if (tShirtRows.length > 0) {
+    const totalRow = { status: 'Total', total: 0 };
+  
+    Object.keys(tShirtCounts?.Collected || {}).forEach((size) => {
+      totalRow[size] =
+        (tShirtCounts?.Collected?.[size] || 0) +
+        (tShirtCounts?.Pending?.[size] || 0);
+      totalRow.total += totalRow[size];
+    });
+  
+    tShirtRows.push(totalRow);
+  }
+  
 
+  const tShirtColumns = [
+    {
+      dataField: 'status',
+      text: 'Collection status by t-shirt size',
+      headerStyle: { ...headerStyle, width: '150px' },
+    },
+    ...Object.keys(tShirtCounts?.Collected || {}).map((size) => ({
+      dataField: size,
+      text: size,
+      headerStyle: headerStyle,
+    })),
+    {
+      dataField: 'total',
+      text: 'Total',
+      headerStyle: headerStyle,
+    },
+  ];
   useEffect(() => {
     if (runnerData.length > 0) {
       const counts = {};
@@ -80,7 +147,7 @@ const Statistics = ({ slug }) => {
         text: category.name,
         headerStyle: headerStyle,
       }));
-      setColumns([{ dataField: 'status', text: 'Collection Status',  headerStyle: {
+      setColumns([{ dataField: 'status', text: 'Collection status by category',  headerStyle: {
         ...headerStyle,
         width: '100px'
       }, }, ...distanceColumns, { dataField: 'total', text: 'Total', headerStyle: headerStyle }]);
@@ -207,6 +274,23 @@ const handleKeyPress = (e)=> {
       ) : (
         <p>Loading...</p>
       )}
+      <div
+  style={{ maxHeight: '450px', overflowY: 'auto' }}
+  className="table-responsive pb-4 mt-4"
+>
+
+  <BootstrapTable
+    keyField="status"
+    data={tShirtRows}
+    columns={tShirtColumns}
+    bootstrap4
+    rowStyle={rowStyle}
+    bordered={false}
+    striped
+    hover
+    condensed
+  />
+</div>
      <div className="row mt-3">
       {distanceCategories.map((distance) => {
         const distanceFilteredRunners = filteredRunners.filter((runner) => runner.distance === distance && runner.isDistributed === true);
