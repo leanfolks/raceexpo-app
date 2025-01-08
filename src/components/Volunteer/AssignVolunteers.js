@@ -52,7 +52,7 @@ const [selectedEvent, setSelectedEvent] = useState("");
       let currentPage = 1;
       const perPage = 10;
       let totalEvents = 0;
-      const response = await getEvents({ userId: userId, page: currentPage, perPage });
+      const response = await getEvents({ page: currentPage, perPage });
       const totalCountHeader = response.headers.get('x-total-count');
       console.log('Total Count Header:', totalCountHeader);
   
@@ -66,7 +66,7 @@ const [selectedEvent, setSelectedEvent] = useState("");
         const pageResponse = await getEvents({ page: currentPage, perPage });
         allEvents = allEvents.concat(pageResponse.data);
       }
-      setEvents(allEvents);
+      setEvents(allEvents?.sort((a, b)=> a.eventName.localeCompare(b.eventName)));
     } catch (error) {
       console.log("Error during fetching events", error);
     }
